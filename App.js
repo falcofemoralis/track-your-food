@@ -1,21 +1,25 @@
+import React, { useState } from 'react';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import Navbar from './src/components/Navbar';
+import Navigation from './src/navigation/Navigation';
+import { AppContext } from './AppContext';
 
 export default function App() {
+  const [foodList, setFoodList] = useState([
+    { id: 1, name: "food 1" },
+    { id: 2, name: "food 2" }
+  ]);
+
+  const state = { foodList, setFoodList };
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <SafeAreaProvider>
+      <AppContext.Provider value={state}>
+        <Navbar />
+        <Navigation />
+        <StatusBar />
+      </AppContext.Provider>
+    </SafeAreaProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
