@@ -1,15 +1,12 @@
 import React, { useState } from 'react';
+import { StatusBar } from 'react-native'
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { StatusBar } from 'expo-status-bar';
 import Navbar from './src/components/Navbar';
 import Navigation from './src/navigation/Navigation';
 import { AppContext } from './AppContext';
 
 export default function App() {
-  const [foodList, setFoodList] = useState([
-    { id: 1, name: "food 1" },
-    { id: 2, name: "food 2" }
-  ]);
+  const [foodList, setFoodList] = useState([{ id: 1, name: "Food 1", date: "31.12.2021", image: "https://images.immediate.co.uk/production/volatile/sites/30/2020/08/chorizo-mozarella-gnocchi-bake-cropped-9ab73a3.jpg" }]);
 
   const state = { foodList, setFoodList };
 
@@ -18,7 +15,7 @@ export default function App() {
       <AppContext.Provider value={state}>
         <Navbar />
         <Navigation />
-        <StatusBar />
+        <StatusBar translucent />
       </AppContext.Provider>
     </SafeAreaProvider>
   );

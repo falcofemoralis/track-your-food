@@ -2,12 +2,9 @@ import React, { useState } from 'react'
 import { View, Text, StyleSheet, Image } from 'react-native'
 
 export default Navbar = props => {
-    const [logoUrl, setLogoUrl] = useState("https://reactjs.org/logo-og.png")
-
     return (
         <View style={styles.navbar}>
-            <Text style={styles.text}>Test App</Text>
-            <Image style={styles.avatar} source={{ uri: logoUrl }} />
+            <Text style={styles.text}>Food App</Text>
         </View>
     )
 }
@@ -22,6 +19,7 @@ const styles = StyleSheet.create({
         paddingBottom: 10
     },
     text: {
+        top: 16,
         color: '#fff',
         fontSize: 20
     },
