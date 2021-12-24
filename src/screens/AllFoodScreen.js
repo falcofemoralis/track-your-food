@@ -1,6 +1,5 @@
 import React, { useContext } from 'react';
-import { StyleSheet, FlatList } from 'react-native';
-import Pressable from 'react-native/Libraries/Components/Pressable/Pressable';
+import { StyleSheet, FlatList, Pressable } from 'react-native';
 import { AppContext } from '../../AppContext';
 import FoodItem from '../components/FoodItem';
 

@@ -1,13 +1,10 @@
 import 'react-native-gesture-handler';
 import * as React from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Image, Pressable } from 'react-native'
+import { StyleSheet, View, Text, Image, Pressable } from 'react-native'
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialCommunityIcons, MaterialIcons } from "react-native-vector-icons"
-import { FontAwesome } from '@expo/vector-icons';
-import LinkingConfiguration from "./LinkingConfiguration"
 
 import AllFoodScreen from '../screens/AllFoodScreen';
 import FridgesScreen from '../screens/FridgesScreen';
