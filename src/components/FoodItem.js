@@ -1,5 +1,7 @@
 import React from "react";
 import { View, StyleSheet, Text, Image, Dimensions } from 'react-native'
+import Colors from "@/constants/Colors";
+import Dimens from '@/constants/Dimens'
 
 export default FoodItem = props => {
     return (
@@ -12,15 +14,15 @@ export default FoodItem = props => {
 
 const styles = StyleSheet.create({
     card: {
-        margin: 5,
-        position: 'relative'
+        position: 'relative',
+        margin: 5
     },
     text: {
         position: 'absolute',
         left: 10,
         bottom: 5,
-        color: '#fff',
-        fontSize: 22,
+        color: Colors.white,
+        fontSize: Dimens.normalTextSize,
         zIndex: 5
     },
     image: {

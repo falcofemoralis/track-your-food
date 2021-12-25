@@ -10,6 +10,7 @@ import AllFoodScreen from '../screens/bottombar/AllFoodScreen';
 import ScanFoodModal from '../screens/modal/ScanFoodModal';
 import FoodScreen from '../screens/FoodScreen';
 import SoonScreen from '../screens/bottombar/SoonScreen';
+
 import Colors from '../constants/Colors';
 import Styles from '../constants/Styles';
 

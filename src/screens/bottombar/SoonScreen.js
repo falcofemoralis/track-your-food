@@ -1,7 +1,8 @@
 import React from 'react';
-import { StyleSheet, Text, View, Button } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import Dimens from '../../constants/Dimens';
 
-export default SoonScreen = props => {
+export default SoonScreen = () => {
     return (
         <View style={styles.center}>
             <Text style={styles.text}>Coming soon!</Text>
@@ -11,7 +12,7 @@ export default SoonScreen = props => {
 
 const styles = StyleSheet.create({
     text: {
-        fontSize: 20
+        fontSize: Dimens.normalTextSize
     },
     center: {
         flex: 1,

@@ -1,7 +1,9 @@
-import React, { useState } from 'react'
-import { View, Text, StyleSheet, Image } from 'react-native'
+import React from 'react'
+import { View, Text, StyleSheet } from 'react-native'
+import Colors from '@/constants/Colors'
+import Dimens from '@/constants/Dimens'
 
-export default Navbar = props => {
+export default Navbar = () => {
     return (
         <View style={styles.navbar}>
             <Text style={styles.text}>Food App</Text>
@@ -11,20 +13,15 @@ export default Navbar = props => {
 
 const styles = StyleSheet.create({
     navbar: {
+        height: 40,
         flexDirection: 'row',
-        height: 70,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#3949ab',
-        paddingBottom: 10
+        backgroundColor: Colors.primaryColor,
     },
     text: {
-        top: 16,
-        color: '#fff',
-        fontSize: 20
-    },
-    avatar: {
-        height: 35,
-        width: 35
+        color: Colors.white,
+        fontSize: Dimens.normalTextSize,
+        fontWeight: 'bold'
     }
 })
