@@ -6,7 +6,14 @@ import Navigation from './src/navigation/Navigation';
 import { AppContext } from './AppContext';
 
 export default function App() {
-  const [foodList, setFoodList] = useState([{ id: 1, name: "Food 1", date: "31.12.2021", image: "https://images.immediate.co.uk/production/volatile/sites/30/2020/08/chorizo-mozarella-gnocchi-bake-cropped-9ab73a3.jpg" }]);
+  const [foodList, setFoodList] = useState([
+    {
+      id: 1,
+      name: "Food 1",
+      date: "31.12.2021",
+      image: "https://images.immediate.co.uk/production/volatile/sites/30/2020/08/chorizo-mozarella-gnocchi-bake-cropped-9ab73a3.jpg"
+    }
+  ]);
 
   const state = { foodList, setFoodList };
 

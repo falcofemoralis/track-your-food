@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { StyleSheet, FlatList, Pressable } from 'react-native';
-import { AppContext } from '../../AppContext';
-import FoodItem from '../components/FoodItem';
+import { AppContext } from '../../../AppContext';
+import FoodItem from '../../components/FoodItem';
 
 export default AllFoodScreen = props => {
     const { foodList } = useContext(AppContext);

@@ -1,19 +1,17 @@
 import 'react-native-gesture-handler';
 import * as React from 'react';
-import { StyleSheet, View, Text, Image, Pressable } from 'react-native'
+import { StyleSheet, View, Text } from 'react-native'
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { MaterialCommunityIcons, MaterialIcons } from "react-native-vector-icons"
+import { MaterialCommunityIcons } from "react-native-vector-icons"
 
-import AllFoodScreen from '../screens/AllFoodScreen';
-import FridgesScreen from '../screens/FridgesScreen';
-import AddFoodScreen from '../screens/AddFoodScreen';
-import OutOfDateScreen from '../screens/OutOfDateScreen';
-import ReceiptsScreen from '../screens/ReceiptsScreen';
-import FoodScreen from '../screens/modal/FoodScreen';
-import SoonScreen from '../screens/SoonScreen';
+import AllFoodScreen from '../screens/bottombar/AllFoodScreen';
+import ScanFoodModal from '../screens/modal/ScanFoodModal';
+import FoodScreen from '../screens/FoodScreen';
+import SoonScreen from '../screens/bottombar/SoonScreen';
 import Colors from '../constants/Colors';
+import Styles from '../constants/Styles';
 
 const Stack = createNativeStackNavigator();
 
@@ -65,15 +63,10 @@ const Bottombar = () => {
                 }} />
 
             <BottomTab.Screen
-                name="AddFoodScreen"
-                component={AddFoodScreen}
+                name="AddScreenComponent"
+                component={AddScreenComponent}
                 options={{
-                    tabBarIcon: () => (
-                        <Image source={require("../../assets/plus.png")} resizeMode='contain' style={{ width: 30, height: 30, tintColor: Colors.white }} />
-                    ),
-                    tabBarButton: props => (
-                        <BottomTabCentralButton {...props} />
-                    )
+                    tabBarButton: () => (<ScanFoodModal />)
                 }} />
 
             <BottomTab.Screen
@@ -108,27 +101,8 @@ const BottomTabButton = props => {
     )
 }
 
-const BottomTabCentralButton = ({ children, onPress, focused }) => {
-    return (
-        <Pressable style={styles.centralBtnCont} onPress={onPress}>
-            <View style={styles.centralBtn} >
-                {children}
-            </View>
-        </Pressable>
-    )
-}
-
-const shadow = {
-    // shadow
-    shadowColor: '#7F5DF0',
-    shadowOffset: {
-        width: 0,
-        height: 10,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.5,
-    elevation: 5
-
+const AddScreenComponent = () => {
+    return null
 }
 
 const styles = StyleSheet.create({
@@ -141,19 +115,6 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.white,
         borderRadius: 15,
         height: 90,
-        ...shadow
-    },
-    centralBtnCont: {
-        top: -30,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 35,
-    },
-    centralBtn: {
-        width: 70,
-        height: 70,
-        borderRadius: 35,
-        backgroundColor: Colors.primaryColor,
-        ...shadow
+        ...Styles.shadow
     }
 })
