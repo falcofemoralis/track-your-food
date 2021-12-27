@@ -1,7 +1,7 @@
 import React from "react";
 import { View, StyleSheet, Text, Image, Dimensions } from 'react-native'
-import Colors from "@/constants/Colors";
-import Dimens from '@/constants/Dimens'
+import Colors from "../constants/Colors";
+import Dimens from '../constants/Dimens'
 
 export default FoodItem = props => {
     return (

@@ -1,7 +1,7 @@
 import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
-import Colors from '@/constants/Colors'
-import Dimens from '@/constants/Dimens'
+import Colors from '../constants/Colors'
+import Dimens from '../constants/Dimens'
 
 export default Navbar = () => {
     return (
