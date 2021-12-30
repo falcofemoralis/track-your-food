@@ -12,6 +12,7 @@ import SoonScreen from '../screens/bottombar/SoonScreen';
 
 import Colors from '../constants/Colors';
 import Styles from '../constants/Styles';
+import EditFoodScreen from '../screens/EditFoodScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -27,6 +28,10 @@ export default Navgiation = () => {
                     <Stack.Screen
                         name="FoodScreen"
                         component={FoodScreen}
+                    />
+                    <Stack.Screen
+                        name="EditFoodScreen"
+                        component={EditFoodScreen}
                     />
                 </Stack.Group>
             </Stack.Navigator>

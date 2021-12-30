@@ -1,17 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { StyleSheet, Text, View, Image, Modal, Pressable, ActivityIndicator, TouchableOpacity, Button } from 'react-native';
 import { Camera } from 'expo-camera';
 import Colors from '../../constants/Colors';
 import Styles from '../../constants/Styles';
 import { BarcodeStatus } from '../../constants/BarcodeStatus';
 import { FindFoodById } from '../../services/FoodService'
+import { AppContext } from '../../../AppContext';
+import * as FileSystem from 'expo-file-system';
+import { useNavigation } from '@react-navigation/native';
 
 export default ScanFoodModal = () => {
     const [hasPermission, setHasPermission] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
     const [flashType, setFlashType] = useState(Camera.Constants.FlashMode.torch)
-    const [barcodeFood, setBarcodeFood] = useState(null)
+    const [food, setFood] = useState({ type: BarcodeStatus.Exist, name: "Test name" })
     const [isBarcodeLoading, setIsBarcodeLoading] = useState(false)
+    const { foodList, setFoodList } = useContext(AppContext);
+    const navigation = useNavigation()
 
     useEffect(() => {
         (async () => {
@@ -40,7 +45,7 @@ export default ScanFoodModal = () => {
         try {
             const food = await FindFoodById(id)
             console.log(food);
-            setBarcodeFood(food)
+            setFood(food)
         } catch (error) {
             console.error(error)
         }
@@ -49,8 +54,37 @@ export default ScanFoodModal = () => {
     }
 
     const closeCamera = () => {
-        setBarcodeFood(null)
-        setIsBarcodeLoading(false)
+        //  setBarcodeFood(null)
+        //  setIsBarcodeLoading(false)
+        setModalVisible(!modalVisible)
+    }
+
+    const addFood = async () => {
+        /*   setFoodList(prev => [
+              ...prev,
+              {
+                  id: Date.now(),
+                  ...food
+              }
+          ]) */
+
+        const newFood = { id: Date.now(), ...food }
+        let list = []
+
+        if (foodList.length > 0) {
+            list = [...foodList, newFood]
+        } else {
+            list = [newFood]
+        }
+
+        setFoodList(list)
+
+        const fileUri = FileSystem.documentDirectory + "foodList.txt";
+        await FileSystem.writeAsStringAsync(fileUri, JSON.stringify(list), { encoding: FileSystem.EncodingType.UTF8 });
+    }
+
+    const editFood = () => {
+        navigation.navigate('EditFoodScreen', food)
         setModalVisible(!modalVisible)
     }
 
@@ -93,27 +127,33 @@ export default ScanFoodModal = () => {
                     <ActivityIndicator size="large" color="#0000ff" />
                 </View>}
 
-            {barcodeFood &&
+            {food &&
                 <View style={styles.barcodeHintView}>
                     <View style={styles.barcodeHintModalView}>
-                        {barcodeFood.type == BarcodeStatus.Exist && <>
-                            <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
+                        {food.type == BarcodeStatus.Exist && <>
+                            <View style={styles.modalTop}>
                                 <View style={styles.modalMain}>
-                                    <Text style={styles.modalHeader}>{barcodeFood.name}</Text>
+                                    <Text style={styles.modalHeader}>{food.name}</Text>
                                     <Text style={styles.modalText}>Uknown brand</Text>
                                     <Text style={styles.modalText}>No info</Text>
                                 </View>
-                                <Image style={styles.modalImage} source={require('../../../assets/no_image.jpg')} />
+                                <Image style={styles.modalImage} source={require('../../../assets/no_image.png')} />
                             </View>
                             <View style={styles.modalBottom}>
-                                <Button style={styles.modalBtn} title='Edit' />
-                                <Button style={styles.modalBtn} title='Add' />
+                                <Pressable style={styles.modalBtn} android_ripple={{ borderless: false }} onPress={editFood}>
+                                    <Text style={styles.actionBtn}>Edit</Text>
+                                </Pressable>
+                                <Pressable style={styles.modalBtn} android_ripple={{ borderless: false }} onPress={addFood}>
+                                    <Text style={styles.actionBtn}>Add</Text>
+                                </Pressable>
                             </View>
                         </>}
-                        {barcodeFood.type == BarcodeStatus.NotFound &&
+                        {food.type == BarcodeStatus.NotFound &&
                             <View style={styles.modalBottomNoProduct}>
-                                <Text>No product</Text>
-                                <Button title='Add' />
+                                <Text style={{ ...styles.modalText, ...styles.noProductText }}>No product</Text>
+                                <Pressable style={styles.noProductBtn} android_ripple={{ borderless: false }} onPress={addFood}>
+                                    <Text style={styles.actionBtn} onPress={editFood}>Create new</Text>
+                                </Pressable>
                             </View>}
                     </View>
                 </View>}
@@ -175,9 +215,8 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'column',
         margin: 20,
-        backgroundColor: "white",
+        backgroundColor: Colors.white,
         borderRadius: 20,
-        padding: 15,
         alignItems: "center",
         shadowColor: "#000",
         shadowOffset: {
@@ -193,33 +232,38 @@ const styles = StyleSheet.create({
         width: '55%'
     },
     modalHeader: {
-        color: 'red',
+        color: Colors.black,
         fontWeight: 'bold'
     },
     modalText: {
-        color: 'red',
+        color: Colors.black,
     },
     modalImage: {
         height: 100,
         width: '45%'
     },
+    modalTop: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        padding: 15,
+    },
     modalBottom: {
-        height: 40,
+        height: 50,
         width: '100%',
         flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between',
-        backgroundColor: '#f4f4f4'
+        backgroundColor: '#f4f4f4',
+        borderBottomLeftRadius: 20,
+        borderBottomRightRadius: 20
     },
     modalBtn: {
         width: '50%',
-        backgroundColor: 'transparent'
-    },
-    modalBottomNoProduct: {
+        backgroundColor: 'transparent',
         flex: 1,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '100%',
+        justifyContent: 'center',
+        textAlign: 'center',
         alignItems: 'center'
     },
     modalProgressBar: {
@@ -230,5 +274,30 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         zIndex: 10
+    },
+    actionBtn: {
+        textAlign: 'center',
+    },
+    modalBottomNoProduct: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+        alignItems: 'center',
+    },
+    noProductBtn: {
+        width: '20%',
+        height: '100%',
+        backgroundColor: 'transparent',
+        flex: 1,
+        justifyContent: 'center',
+        textAlign: 'center',
+        alignItems: 'center',
+    },
+    noProductText: {
+        paddingStart: 15,
+        paddingTop: 10,
+        paddingBottom: 10,
+        width: '80%'
     }
 });
