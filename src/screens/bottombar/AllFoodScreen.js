@@ -3,17 +3,21 @@ import { StyleSheet, FlatList, Pressable } from 'react-native';
 import { AppContext } from '../../../AppContext';
 import FoodItem from '../../components/FoodItem';
 
-export default AllFoodScreen = props => {
-    const { foodList } = useContext(AppContext);
+export default AllFoodScreen = ({ navigation }) => {
+    const { foodService } = useContext(AppContext);
+
+    onPressHandler = item => {
+        navigation.navigate('FoodScreen', { food: item })
+    }
 
     return (
         <FlatList
             style={styles.list}
-            data={foodList}
+            data={foodService.foodList}
             renderItem={({ item }) => {
                 return (
-                    <Pressable onPress={() => props.navigation.navigate('FoodScreen', item)}>
-                        <FoodItem name={item.name} image={item.image} />
+                    <Pressable onPress={() => onPressHandler(item)}>
+                        <FoodItem food={item} />
                     </Pressable>
                 )
             }}

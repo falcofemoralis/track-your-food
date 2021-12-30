@@ -4,12 +4,12 @@ import Colors from "../constants/Colors";
 import Dimens from '../constants/Dimens'
 import { LinearGradient } from 'expo-linear-gradient';
 
-export default FoodItem = props => {
+export default FoodItem = ({ food }) => {
     return (
         <View style={styles.card}>
             <LinearGradient colors={['transparent', 'rgba(0,0,0,0.25)']} style={styles.background} />
-            <Text style={styles.text}>{props.name}</Text>
-            <Image source={props.image ? { uri: props.image } : require('../../assets/no_image.png')} style={styles.image} />
+            <Text style={styles.text}>{food.name}</Text>
+            <Image source={food.image ? { uri: food.image } : require('../../assets/no_image.png')} style={styles.image} />
         </View>
     )
 }

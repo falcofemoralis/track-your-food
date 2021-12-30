@@ -1,8 +1,8 @@
 import React from 'react';
 import { StyleSheet, Text, View, Button } from 'react-native';
 
-export default OutOfDateScreen = ({ route }) => {
-    const food = route.params
+export default FoodScreen = ({ route }) => {
+    const { food } = route.params
 
     return (
         <View>

@@ -1,22 +1,22 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { StyleSheet, Text, View, Image, Modal, Pressable, ActivityIndicator, TouchableOpacity, Button } from 'react-native';
+import { StyleSheet, Text, View, Image, Modal, Pressable, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { Camera } from 'expo-camera';
 import Colors from '../../constants/Colors';
 import Styles from '../../constants/Styles';
-import { BarcodeStatus } from '../../constants/BarcodeStatus';
-import { FindFoodById } from '../../services/FoodService'
 import { AppContext } from '../../../AppContext';
-import * as FileSystem from 'expo-file-system';
 import { useNavigation } from '@react-navigation/native';
+import Food from '../../objects/Food'
 
 export default ScanFoodModal = () => {
+    const { foodService } = useContext(AppContext);
+    const navigation = useNavigation()
     const [hasPermission, setHasPermission] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
-    const [flashType, setFlashType] = useState(Camera.Constants.FlashMode.torch)
-    const [food, setFood] = useState({ type: BarcodeStatus.Exist, name: "Test name" })
-    const [isBarcodeLoading, setIsBarcodeLoading] = useState(false)
-    const { foodList, setFoodList } = useContext(AppContext);
-    const navigation = useNavigation()
+
+    const [flashType, setFlashType] = useState(Camera.Constants.FlashMode.torch) // Тип вспышки камеры
+    const [currentFood, setCurrentFood] = useState(null) // Текущая отсканированая еда
+    const [isBarcodeLoading, setIsBarcodeLoading] = useState(false) // Бар загрузки
+    const [notFoundFood, setNotFoundFood] = useState(true) // Состояние окна о не найденной еде
 
     useEffect(() => {
         (async () => {
@@ -33,6 +33,26 @@ export default ScanFoodModal = () => {
         return <Text>No access to camera</Text>;
     }
 
+    /**
+     * Открытие модального окна камеры
+     */
+    const openCamera = () => {
+        setModalVisible(!modalVisible)
+    }
+
+    /**
+     * Закрытие модального окна камеры
+     */
+    const closeCamera = () => {
+        setCurrentFood(null)
+        setIsBarcodeLoading(false)
+        setNotFoundFood(false)
+        setModalVisible(!modalVisible)
+    }
+
+    /**
+     * Изменение состояние вспышки у камеры
+     */
     const changeFlashType = () => {
         setFlashType(
             flashType === Camera.Constants.FlashMode.off
@@ -41,56 +61,47 @@ export default ScanFoodModal = () => {
         );
     }
 
-    const getFood = async (id) => {
-        try {
-            const food = await FindFoodById(id)
-            console.log(food);
-            setFood(food)
-        } catch (error) {
-            console.error(error)
+    /**
+     * Обработчик сканирования штрих кода
+     * @param {number} type - тип штрих-кода
+     * @param {number} data - id штрих-кода 
+     */
+    const onBarCodeScanned = async ({ type, data }) => {
+        if (type == 32 && !isBarcodeLoading) {
+            setIsBarcodeLoading(true)
+
+            // Получение объекта еды
+            try {
+                const food = await foodService.findFoodById(data)
+                setCurrentFood(food)
+                setNotFoundFood(false)
+            } catch (error) {
+                setNotFoundFood(true)
+            }
+
+            setIsBarcodeLoading(false)
         }
-
-        setIsBarcodeLoading(false)
     }
 
-    const closeCamera = () => {
-        //  setBarcodeFood(null)
-        //  setIsBarcodeLoading(false)
-        setModalVisible(!modalVisible)
+    /**
+     * Обработчик добавления еды
+     */
+    const onAddFoodHandler = async () => {
+        foodService.addFood(currentFood)
+        setCurrentFood(null)
     }
 
-    const addFood = async () => {
-        /*   setFoodList(prev => [
-              ...prev,
-              {
-                  id: Date.now(),
-                  ...food
-              }
-          ]) */
-
-        const newFood = { id: Date.now(), ...food }
-        let list = []
-
-        if (foodList.length > 0) {
-            list = [...foodList, newFood]
-        } else {
-            list = [newFood]
-        }
-
-        setFoodList(list)
-
-        const fileUri = FileSystem.documentDirectory + "foodList.txt";
-        await FileSystem.writeAsStringAsync(fileUri, JSON.stringify(list), { encoding: FileSystem.EncodingType.UTF8 });
-    }
-
-    const editFood = () => {
-        navigation.navigate('EditFoodScreen', food)
-        setModalVisible(!modalVisible)
+    /**
+     * Открытие окна редактирования еды
+     */
+    const onEditFoodHandler = () => {
+        navigation.navigate('EditFoodScreen', { food: currentFood })
+        closeCamera()
     }
 
     return (<>
         <View style={styles.buttonView}>
-            <Pressable style={styles.pressableView} onPress={() => setModalVisible(!modalVisible)} android_ripple={{ borderless: false }}>
+            <Pressable style={styles.pressableView} onPress={openCamera} android_ripple={{ borderless: false }}>
                 <View>
                     <Image source={require('../../images/plus.png')} resizeMode='contain' style={{ width: 30, height: 30, tintColor: Colors.white }} />
                 </View>
@@ -100,17 +111,13 @@ export default ScanFoodModal = () => {
             visible={modalVisible}
             animationType={'slide'}
             onRequestClose={closeCamera}>
+
             <View style={styles.cameraContainer}>
                 <Camera
                     ratio='16:9'
                     style={styles.camera}
                     flashMode={flashType}
-                    onBarCodeScanned={res => {
-                        if (res.type == 32 && !isBarcodeLoading) {
-                            setIsBarcodeLoading(true)
-                            getFood(res.data)
-                        }
-                    }}>
+                    onBarCodeScanned={onBarCodeScanned}>
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity style={styles.button} onPress={changeFlashType}>
                             <Image
@@ -127,38 +134,42 @@ export default ScanFoodModal = () => {
                     <ActivityIndicator size="large" color="#0000ff" />
                 </View>}
 
-            {food &&
+
+            {!notFoundFood && currentFood &&
                 <View style={styles.barcodeHintView}>
                     <View style={styles.barcodeHintModalView}>
-                        {food.type == BarcodeStatus.Exist && <>
-                            <View style={styles.modalTop}>
-                                <View style={styles.modalMain}>
-                                    <Text style={styles.modalHeader}>{food.name}</Text>
-                                    <Text style={styles.modalText}>Uknown brand</Text>
-                                    <Text style={styles.modalText}>No info</Text>
-                                </View>
-                                <Image style={styles.modalImage} source={require('../../../assets/no_image.png')} />
+                        <View style={styles.modalTop}>
+                            <View style={styles.modalMain}>
+                                <Text style={styles.modalHeader}>{currentFood.name}</Text>
+                                <Text style={styles.modalText}>Uknown brand</Text>
+                                <Text style={styles.modalText}>No info</Text>
                             </View>
-                            <View style={styles.modalBottom}>
-                                <Pressable style={styles.modalBtn} android_ripple={{ borderless: false }} onPress={editFood}>
-                                    <Text style={styles.actionBtn}>Edit</Text>
-                                </Pressable>
-                                <Pressable style={styles.modalBtn} android_ripple={{ borderless: false }} onPress={addFood}>
-                                    <Text style={styles.actionBtn}>Add</Text>
-                                </Pressable>
-                            </View>
-                        </>}
-                        {food.type == BarcodeStatus.NotFound &&
-                            <View style={styles.modalBottomNoProduct}>
-                                <Text style={{ ...styles.modalText, ...styles.noProductText }}>No product</Text>
-                                <Pressable style={styles.noProductBtn} android_ripple={{ borderless: false }} onPress={addFood}>
-                                    <Text style={styles.actionBtn} onPress={editFood}>Create new</Text>
-                                </Pressable>
-                            </View>}
+                            <Image style={styles.modalImage} source={require('../../../assets/no_image.png')} />
+                        </View>
+
+                        <View style={styles.modalBottom}>
+                            <Pressable style={styles.modalBtn} android_ripple={{ borderless: false }} onPress={onEditFoodHandler}>
+                                <Text style={styles.actionBtn}>Edit</Text>
+                            </Pressable>
+                            <Pressable style={styles.modalBtn} android_ripple={{ borderless: false }} onPress={onAddFoodHandler}>
+                                <Text style={styles.actionBtn}>Add</Text>
+                            </Pressable>
+                        </View>
+                    </View>
+                </View>}
+
+            {notFoundFood &&
+                <View style={styles.barcodeHintView}>
+                    <View style={styles.barcodeHintModalView}>
+                        <View style={styles.modalBottomNoProduct}>
+                            <Text style={{ ...styles.modalText, ...styles.noProductText }}>No product</Text>
+                            <Pressable style={styles.noProductBtn} android_ripple={{ borderless: false }} onPress={onEditFoodHandler}>
+                                <Text style={styles.actionBtn}>Create new</Text>
+                            </Pressable>
+                        </View>
                     </View>
                 </View>}
         </Modal>
-
     </>
     );
 }
